@@ -1,0 +1,137 @@
+esphome:
+  name: s1d15721-lcd-example
+
+esp32:
+  board: # define your board here
+
+# Enable logging
+logger:
+
+# Your WiFi Settings here:
+wifi:
+  ssid: "<your SSID>"
+  password: "<your PSK>"
+
+# Enable Home Assistant API:
+# Connection to a Home Assistant instance is used to get the current time (see below)
+# and to use the template buttons and switches defined below
+api:
+
+# Get time from Home Assistant (used in lcd "page_clock")
+time:
+  - platform: homeassistant
+    id: esptime
+
+# ---------------- Display ----------------
+
+external_components:
+# if you manually clone the repository to your ESPHome directory use the following:
+#  - source: components
+# otherwise use this to automatically download the components from GitHub:
+  - source: github://SuperPlusUser/esphome_external_components
+
+spi:
+  clk_pin: GPIO18
+  mosi_pin: GPIO23
+
+display:
+  - platform: s1d15721_spi
+    id: lcd
+    model: "S1D15721 240x64" # This is the only option here at this moment. Works with the "VARITRONIX LCD, COG-VLGEM1277-01, 240x64 pixel"
+    #reset_pin: GPIO19 # optional. Reset pin can also be permanently connected to 3.3V
+    cs_pin: GPIO5 # optional and only needed, if you want to use multiple devices on the same SPI Bus. Otherwise CS can be connected to GND.
+    dc_pin: GPIO17 # required, = A0
+    update_interval: 1s
+    invert: true # optional: enable inverse mode at startup
+    rotation: 0°
+    pages: # draw 2 example pages
+      - id: page_helloworld # the obligatory "Hello World":
+        lambda: |-
+          it.print(5, 0, id(font1), "Hello World ! :)");
+          it.filled_circle(30, 48, 15, id(light_gray));
+          it.filled_circle(60, 48, 15, id(dark_gray));
+          it.filled_circle(90, 48, 15, COLOR_ON);
+          it.line(0, 32, 239, 32, id(light_gray));
+          it.line(0, 63, 239, 0,  id(dark_gray));
+          it.line(120, 0, 120, 63, COLOR_ON );
+          it.filled_rectangle(135, 33, 30, 30, id(light_gray));
+          it.filled_rectangle(165, 33, 30, 30, id(dark_gray));
+          it.filled_rectangle(195, 33, 30, 30, COLOR_ON);
+      - id: page_clock # 24h clock:
+        lambda: |-
+          // Print time in HH:MM:SS format
+          it.strftime(3, 0, id(font2), "%H:%M:%S", id(esptime).now());
+          it.strftime(3, 46, id(font1), "%A, %d.%m.%Y", id(esptime).now());
+
+# The display supports 4 gray levels: COLOR_OFF (= black), dark_gray, light_gray and COLOR_ON (= white).
+# COLOR_ON and COLOR_OFF are predefined, the other 2 "colors" have to be defined here:
+color:
+  - id: light_gray
+    white: 30% # anything between 25% and 50% results in light gray
+  - id: dark_gray
+    white: 70% # anything between 50% and 75% results in dark gray
+
+font:
+  - file: 
+      type: gfonts
+      family: Ubuntu
+      weight: 400
+    id: font1
+    size: 16
+  - file:
+      type: gfonts
+      family: Ubuntu
+      weight: 500
+    id: font2
+    size: 42
+
+# -------- Buttons and switches to control display from Home Assistant ----------
+
+# button to switch betweeen the 2 pages:
+button:
+  - platform: template
+    name: "LCD Next Page"
+    on_press:
+      then:
+        - display.page.show_next: lcd
+        - component.update: lcd
+
+switch:
+# switch betweeen normal and inverse mode at runtime:
+  - platform: template
+    name: "LCD Inverse Mode"
+    lambda: |-
+      return id(lcd).is_inverted();
+    turn_on_action:
+      then:
+        - lambda: |-
+            id(lcd).set_invert(true);
+    turn_off_action:
+      then:
+        - lambda: |-
+            id(lcd).set_invert(false);
+# turn on and off the lcd:
+  - platform: template
+    name: "LCD ON/OFF"
+    lambda: |-
+      return id(lcd).is_on();
+    turn_on_action:
+      then:
+        - lambda: |-
+            id(lcd).turn_on();
+    turn_off_action:
+      then:
+        - lambda: |-
+            id(lcd).turn_off();
+
+# Control backlight brightness with pwm:
+# Note: Since the backlight can draw some current, you shouldn't drive it directly from a GPIO port, but add a transistor, for example!
+output:
+  - platform: ledc
+    pin: GPIO16
+    id: gpio16
+
+light:
+  - platform: monochromatic
+    output: gpio16
+    name: "LCD Backlight"
