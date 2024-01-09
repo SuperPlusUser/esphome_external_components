@@ -70,3 +70,7 @@ color:
 
 Technically, the two most significant bits of the `color.white` value are used to determine the gray level. So in theory it should also be possible to display pictures on the display, but I have not testetd this and I would not expect good looking results.
 
+## Requirements
+
+- ESPHome 2023.12.0 or higher
+
