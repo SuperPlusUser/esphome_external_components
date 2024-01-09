@@ -12,8 +12,7 @@ enum s1d15721Model {
   s1d15721_MODEL_240_64 = 0,
 };
 
-class SPIs1d15721 : public PollingComponent, 
-                    public display::DisplayBuffer,
+class SPIs1d15721 : public display::DisplayBuffer,
                     public spi::SPIDevice<spi::BIT_ORDER_MSB_FIRST, spi::CLOCK_POLARITY_HIGH, 
                                           spi::CLOCK_PHASE_TRAILING, spi::DATA_RATE_8MHZ> {
 public:
