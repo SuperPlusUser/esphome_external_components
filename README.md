@@ -10,6 +10,7 @@ To use the components provided by this repository, simply add this to your `.yam
 external_components:
   - source: github://SuperPlusUser/esphome_external_components
 ```
+
 More information can be found [here](https://esphome.io/components/external_components.html).
 
 ## Components

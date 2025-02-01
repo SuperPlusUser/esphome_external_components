@@ -1,20 +1,21 @@
 # s1d15721_spi
 
-This component allows you to use displays controlled by the S1D15721 chip in ESPHome. The display must be connected via 4-Wire SPI bus. 
+This component allows you to use displays controlled by the S1D15721 chip in ESPHome. The display must be connected via 4-Wire SPI bus.
 It can display 4 gray levels.
 
 ## Supported displays
 
 ### VARITRONIX VL-FS-COG-VLGEM1277-01, 240x64 pixel (`S1D15721 240x64`)
+
 At the moment this is the only supported display (and the only one I know of with this controller). It is currently available in the German online shop [Pollin.de](https://www.pollin.de/p/varitronix-lcd-cog-vlgem1277-01-240x64-pixel-121713) for less than €1. Unfortunately it's not really "plug and play" as it uses an FPC connector and requires some external capacitors.
 
-[This](https://www.mikrocontroller.net/topic/472549) Thread on Mikrocontroller.net has some examples of how to connect the display (in German). I also found [this](https://www.shotech.de/de/lcd-vlgem1277-01-adapter-board-3-3v-vcc.html) pre-soldered adapter board for the display, which looks useful but I haven't tested it yet.
+[This](https://www.mikrocontroller.net/topic/472549) thread on Mikrocontroller.net has some examples of how to connect the display (in German). I also found [this](https://www.shotech.de/de/lcd-vlgem1277-01-adapter-board-3-3v-vcc.html) pre-soldered adapter board for the display, which looks useful but I haven't tested it yet.
 
 Note: The linked offers serve only as an example. I am not affiliated with the sellers or manufacturers.
 
 ## Usage
 
-### Example configuration entry: 
+### Example configuration entry:
 
 ```yaml
 external_components:
@@ -60,6 +61,7 @@ For a more complex example see [example.yaml](../../example.yaml)
 ### Gray levels
 
 The controller supports 4 gray levels (2 bits): COLOR_OFF (= black), dark_gray, light_gray and COLOR_ON (= white). COLOR_ON and COLOR_OFF are predefined, the other 2 "colors" have to be defined in yaml like this:
+
 ```yaml
 color:
   - id: light_gray
@@ -68,7 +70,7 @@ color:
     white: 70% # anything between 50% and 75% results in dark gray
 ```
 
-Technically, the two most significant bits of the `color.white` value are used to determine the gray level. So in theory it should also be possible to display pictures on the display, but I have not testetd this and I would not expect good looking results.
+Technically, the two most significant bits of the `color.white` value are used to determine the gray level. So in theory it should also be possible to display pictures on the display, but I have not tested this and I would not expect good looking results.
 
 ## Requirements
 
